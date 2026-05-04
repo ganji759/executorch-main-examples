@@ -8,11 +8,19 @@ A real-time bird detection and species identification Android app using YOLO + E
 
 ## Prerequisites
 
-Install required dependencies:
+Install PyTorch and ExecuTorch by following the [ExecuTorch installation guide](https://docs.pytorch.org/executorch/main/getting-started.html), which pins the compatible torch version. The simplest path is:
 
 ```bash
-pip install torch transformers executorch ultralytics
+pip install executorch
 ```
+
+Then install the remaining dependencies:
+
+```bash
+pip install transformers ultralytics
+```
+
+For Android-specific setup, see the [Android section](https://docs.pytorch.org/executorch/main/android-section.html) of the ExecuTorch docs.
 
 ## Model Download and Conversion
 
@@ -52,29 +60,7 @@ Run the script:
 python convert_bird_classifier.py
 ```
 
-### Step 2: Download YOLO Detection Model
-
-The app supports both YOLOv8 and YOLOv26, and automatically detects which version you're using based on the model output format.
-
-```bash
-pip install ultralytics
-```
-
-#### Option 1: YOLOv8
-```python
-from ultralytics import YOLO
-model = YOLO('yolov8n.pt')  # nano version for mobile
-print('YOLOv8 model downloaded')
-```
-
-#### Option 2: YOLOv26 (Recommended - Faster & More Accurate)
-```python
-from ultralytics import YOLO
-model = YOLO('yolo26n.pt')  # nano version for mobile
-print('YOLOv26 model downloaded')
-```
-
-### Step 3: Convert YOLO Model to .pte Format
+### Step 2: Convert YOLO Model to .pte Format
 
 Create `convert_yolo.py`:
 
@@ -108,7 +94,7 @@ print("YOLO model converted to yolo_detector.pte")
 
 **Auto-Detection:** The app automatically detects which YOLO version you're using (v8 or v26) based on the model's output format. No code changes needed when switching between versions!
 
-### Step 4: Generate Bird Species Names
+### Step 3: Generate Bird Species Names
 
 Create `extract_species_names.py`:
 
@@ -116,7 +102,7 @@ Create `extract_species_names.py`:
 from transformers import AutoModelForImageClassification
 import json
 
-model = AutoModelForImageClassification.from_pretrained('./bird_classifier_model')
+model = AutoModelForImageClassification.from_pretrained('chriamue/bird_classifier_model')
 species_names = [model.config.id2label[i] for i in range(len(model.config.id2label))]
 
 with open('bird_species.json', 'w') as f:
@@ -127,7 +113,7 @@ print(f"Saved {len(species_names)} bird species names to bird_species.json")
 
 ## Deploying Models to Android
 
-### Step 5: Deploy Models to Android Device
+### Step 4: Deploy Models to Android Device
 
 #### Copy Models to Android Assets
 
